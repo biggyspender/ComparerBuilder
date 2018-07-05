@@ -36,7 +36,20 @@ namespace ComparerBuilder
 
         public IComparer<T> Build()
         {
-            return Comparer<T>.Create((a, b) => comparers.Select(c => c.Compare(a, b)).FirstOrDefault(x => x != 0));
+            return Comparer<T>.Create((a, b) =>
+            {
+                //no Linq. no foreach. We want this to be as quick as possible.
+                for (var i = 0; i < comparers.Count; i++)
+                {
+                    var comparer = comparers[i];
+                    var comparison = comparer.Compare(a, b);
+                    if (comparison != 0)
+                    {
+                        return comparison;
+                    }
+                }
+                return 0;
+            });
         }
 
         public IThenKeyComparerBuilder<T> ThenKey<TKey>(Func<T, TKey> selector) where TKey : IComparable<TKey>
