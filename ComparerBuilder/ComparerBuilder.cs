@@ -6,14 +6,14 @@ namespace ComparerBuilder
 {
     public class ComparerBuilder<T> : IComparerBuilder<T>, IThenKeyComparerBuilder<T>
     {
-        private readonly IList<IComparer<T>> comparers;
+        private readonly IReadOnlyList<IComparer<T>> comparers;
 
         public ComparerBuilder()
         {
             comparers = new List<IComparer<T>>();
         }
 
-        private ComparerBuilder(IList<IComparer<T>> comparers)
+        private ComparerBuilder(IReadOnlyList<IComparer<T>> comparers)
         {
             this.comparers = comparers;
         }
@@ -48,6 +48,7 @@ namespace ComparerBuilder
                         return comparison;
                     }
                 }
+
                 return 0;
             });
         }
