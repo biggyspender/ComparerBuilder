@@ -6,26 +6,35 @@ namespace ComparerBuilder
 {
     public class ComparerBuilder<T> : IComparerBuilder<T>, IThenKeyComparerBuilder<T>
     {
-        private readonly IList<IComparer<T>> comparers = new List<IComparer<T>>();
+        private readonly IList<IComparer<T>> comparers;
+
+        public ComparerBuilder()
+        {
+            comparers = new List<IComparer<T>>();
+        }
+
+        private ComparerBuilder(IList<IComparer<T>> comparers)
+        {
+            this.comparers = comparers.ToList();
+        }
 
         public IThenKeyComparerBuilder<T> SortKey<TKey>(Func<T, TKey> selector) where TKey : IComparable<TKey>
         {
             var comparer = Comparer<T>.Create((a, b) => selector(a).CompareTo(selector(b)));
             comparers.Add(comparer);
-            return this;
+            return new ComparerBuilder<T>(comparers);
         }
 
         public IThenKeyComparerBuilder<T> SortKeyDescending<TKey>(Func<T, TKey> selector) where TKey : IComparable<TKey>
         {
             var comparer = Comparer<T>.Create((a, b) => selector(b).CompareTo(selector(a)));
             comparers.Add(comparer);
-            return this;
+            return new ComparerBuilder<T>(comparers);
         }
 
         public IComparer<T> Build()
         {
-            var comparersCopy = comparers.ToList();
-            return Comparer<T>.Create((a, b) => comparersCopy.Select(c => c.Compare(a, b)).FirstOrDefault(x => x != 0));
+            return Comparer<T>.Create((a, b) => comparers.Select(c => c.Compare(a, b)).FirstOrDefault(x => x != 0));
         }
 
         public IThenKeyComparerBuilder<T> ThenKey<TKey>(Func<T, TKey> selector) where TKey : IComparable<TKey>
