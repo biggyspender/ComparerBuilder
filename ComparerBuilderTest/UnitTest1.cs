@@ -1,4 +1,3 @@
-using System;
 using ComparerBuilder;
 using MoreLinq;
 using Xunit;
