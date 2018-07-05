@@ -15,21 +15,23 @@ namespace ComparerBuilder
 
         private ComparerBuilder(IList<IComparer<T>> comparers)
         {
-            this.comparers = comparers.ToList();
+            this.comparers = comparers;
         }
 
         public IThenKeyComparerBuilder<T> SortKey<TKey>(Func<T, TKey> selector) where TKey : IComparable<TKey>
         {
             var comparer = Comparer<T>.Create((a, b) => selector(a).CompareTo(selector(b)));
-            comparers.Add(comparer);
-            return new ComparerBuilder<T>(comparers);
+            var newComparers = comparers.ToList();
+            newComparers.Add(comparer);
+            return new ComparerBuilder<T>(newComparers);
         }
 
         public IThenKeyComparerBuilder<T> SortKeyDescending<TKey>(Func<T, TKey> selector) where TKey : IComparable<TKey>
         {
             var comparer = Comparer<T>.Create((a, b) => selector(b).CompareTo(selector(a)));
-            comparers.Add(comparer);
-            return new ComparerBuilder<T>(comparers);
+            var newComparers = comparers.ToList();
+            newComparers.Add(comparer);
+            return new ComparerBuilder<T>(newComparers);
         }
 
         public IComparer<T> Build()
